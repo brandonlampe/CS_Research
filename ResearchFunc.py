@@ -1,8 +1,13 @@
 """
     Module to be loaded for research on the consolidation of crushed salt
     Content includes:
-        (1) minimeter_import: function for importing data recording using
-        labview at the UNM lab
+        (1) HeatEqn_1D: solves transient heat equation in 1D (Finite Diff)
+        (2) minimeter_import: function for importing data recording using
+            labview at the UNM lab
+        (3) plot_mmdat: plots data obtained form MiniMeter
+        (4) visc_n2: uses CoolProp to calc viscosity of N2
+        (5) z_n2: uses CoolProp to calc compressiblity factor of N2
+        (6) rho_n2: uses CoolProp to calc density of N2
 """
 
 import numpy as np
@@ -15,7 +20,7 @@ import scipy.linalg
 np.set_printoptions(precision=6, threshold=1000, suppress=False, linewidth=80)
 
 
-class OneDim_Trans_HeatEqn_FD():
+class HeatEqn_1D():
     """
     One-dimension heat equation
     """
