@@ -8,6 +8,7 @@
         (4) visc_n2: uses CoolProp to calc viscosity of N2
         (5) z_n2: uses CoolProp to calc compressiblity factor of N2
         (6) rho_n2: uses CoolProp to calc density of N2
+        (7) runavg: calculates the running avg of values in a vector
 """
 
 import numpy as np
@@ -291,7 +292,7 @@ def minimeter_import(fname, delimit=',', skip=1,
     time_str = np.loadtxt(fname, dtype=str, delimiter=delimit, skiprows=skip,
                           usecols=[0])
     time_inp = np.zeros((len(data_inp[:, 0]), 2)).astype(datetime)
-    start = datestr2num(time_str[0])
+    start = datestr2num(time_str[0], date_format)
     for i in xrange(time_inp.shape[0]):
         time_inp[i, 0] = datestr2num(time_str[i], date_format)
         delta = time_inp[i, 0] - start
@@ -306,6 +307,14 @@ def plot_mmdat(data, splice=0, idx_min=0, idx_max=0,
     """
     Function for plotting data obtained via LabView from the Minimeter
          in UNM's geotech lab
+
+    Input
+    data (required): data from minimeter DAQ for plotting
+    splice (opt): determines of the whole or just a splice of data will
+                  be plotted.
+                  splice = 0: all data will be plotted
+                  splice = 1: data defined by idx_min and idx_max will be
+                  plotted
     """
     if splice != 0:
         time = data[idx_min:idx_max, time_idx]
@@ -337,6 +346,7 @@ def plot_mmdat(data, splice=0, idx_min=0, idx_max=0,
     AX1[1].set_ylabel('Temperature (C)', fontsize=12)
     AX1[0].grid(True, which='major')
     AX1[1].grid(True, which='major')
+    plt.show()
 
 
 def visc_n2(T, P):
@@ -370,3 +380,27 @@ def rho_n2(T, P):
     rho = M*P/(z*R*T)  # kg/m3
 #     PropsSI('D', 'T', 298.15, 'P', 101325, 'Nitrogen')
     return rho
+
+
+def runavg(input_vect, window_size):
+    """
+        Calculates the running mean of a vector
+
+        input:
+        input_vect = the input vector
+        window_size = number of values to be included in calculate the average
+
+        output:
+        out = vector of average values
+            - dimension of output vector will be shorter by 'window_size'
+            - 'window_size'/2 values will be trimmed from start and end
+                of input_vector
+            - out dimenions: out = input_vect[1+trim:-trim],
+                where trim = window_size/2
+    """
+
+    window = np.ones(int(window_size)) / float(window_size)
+    avg = np.convolve(input_vect, window, 'same')
+    trim = int(window_size/2)
+    out = avg[trim:-trim]
+    return out
