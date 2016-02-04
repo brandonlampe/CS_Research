@@ -1,14 +1,17 @@
 """
     Module to be loaded for research on the consolidation of crushed salt
     Content includes:
-        (1) HeatEqn_1D: solves transient heat equation in 1D (Finite Diff)
-        (2) minimeter_import: function for importing data recording using
+        * GasFlow1D: solves transient gas (copmressible) flow in porous media
+            - handles Dirichlet and Neumann type BCTs
+        * HeatEqn_1D: solves transient heat equation in 1D (Finite Diff)
+            - only Dirichlet type BCTs work
+        * minimeter_import: function for importing data recording using
             labview at the UNM lab
-        (3) plot_mmdat: plots data obtained form MiniMeter
-        (4) visc_n2: uses CoolProp to calc viscosity of N2
-        (5) z_n2: uses CoolProp to calc compressiblity factor of N2
-        (6) rho_n2: uses CoolProp to calc density of N2
-        (7) runavg: calculates the running avg of values in a vector
+        * plot_mmdat: plots data obtained form MiniMeter
+        * visc_n2: uses CoolProp to calc viscosity of N2
+        * z_n2: uses CoolProp to calc compressiblity factor of N2
+        * rho_n2: uses CoolProp to calc density of N2
+        * runavg: calculates the running avg of values in a vector
 """
 
 import numpy as np
@@ -155,9 +158,6 @@ class GasFlow_1D():
             self.A[1, 0] = 0  # modification to mainatin symmetry
         elif self.BC_type[0] == 0:
             # natural BC, Flux (Q*)
-            # n = -1.0  # unit outward normal
-            # dT = self.BC_0 / (self.kA * n)
-
             # modifies [K] first equation
             self.A[0, 0:2] = self.k/np.double(self.h)**2 * np.array([1, -1])
 
@@ -168,9 +168,6 @@ class GasFlow_1D():
             self.A[-2][-1] = 0  # modification to mainatin symmetry
         elif self.BC_type[1] == 0:
             # natural BC, flux (Q*)
-            # n = 1.0  # unit outward normal
-            # dT = self.BC_L / (self.kA * n)
-
             # modifies last equation
             self.A[-1][-2:] = (self.k / (self.h)**2) * np.array([-1, 1])
         return self.A
@@ -212,15 +209,16 @@ class GasFlow_1D():
         elif self.BC_type[0] == 2:
             # essential BC - time dependent
             self.b[0] = self.BC_0(t)**2  # modifies first equation
+
             # modification to mainatin symmetry
             self.b[1] = self.b[1] - self.A_old[0] * self.BC_0(t)**2
         elif self.BC_type[0] == 0:
             # natural BC, Flux (Q*)
             n = -1.0  # unit outward normal
-            term_a = self.BC_L / (self.k * n)
+            term_a = self.BC_0 / (self.k * n)
             term_b = (term_a * self.h + np.sqrt(P_old[0]))**2 - P_old[0]
             # modifies {F} last equation
-            self.b[0] = (self.k/self.h**2) * term_b
+            self.b[0] = -(self.k/self.h**2) * term_b
 
         # boundary condition at x = L
         if self.BC_type[1] == 1:
