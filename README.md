@@ -1,8 +1,9 @@
 # Crushed Salt Research Directory
 This directory contains Python scripts for the analysis of crushed salt.
-Author: Brandon Lampe
 
-### ResearchFunc.py:
+**Author: Brandon Lampe**
+
+### ResearchFunc.py
     A group of special purpose functions used in the analysis of crushed salt, the functions included are:
 
         - GasFlow1D: solves transient gas (copmressible) flow in porous media
@@ -18,7 +19,8 @@ Author: Brandon Lampe
         - z_n2: uses CoolProp to calc compressiblity factor of N2
         - rho_n2: uses CoolProp to calc density of N2
         - runavg: calculates the running avg of values in a vector
-DiffFlow_1D.py:
+
+### DiffFlow_1D.py
     A script used as a wrapper to GasFlow1D to slve 1D compressible flow through porous media.  The script solves for $P$ in the following equation:
 
     \begin(equation}
